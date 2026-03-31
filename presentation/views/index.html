@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Builder Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/typography.css">
+    <link rel="stylesheet" href="../styles/buttons.css">
+    <link rel="stylesheet" href="../styles/screens.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link rel="stylesheet" href="../styles/panels.css">
+    <link rel="stylesheet" href="../styles/map.css">
+    <link rel="stylesheet" href="../styles/responsive.css">
+
+    <!-- MODELOS BASE (van primero porque los demás dependen de ellos) -->
+    <script src="../../js/models/Building.js"></script>
+    <script src="../../js/models/ResidentialBuilding.js"></script>
+    <script src="../../js/models/CommercialBuilding.js"></script>
+    <script src="../../js/models/IndustrialBuilding.js"></script>
+    <script src="../../js/models/ServiceBuilding.js"></script>
+    <script src="../../js/models/UtilityPlant.js"></script>
+    <script src="../../js/models/Park.js"></script>
+    <script src="../../js/models/Road.js"></script>
+    <script src="../../js/models/Cell.js"></script>
+    <script src="../../js/models/Grid.js"></script>
+    <script src="../../js/models/Citizen.js"></script>
+    <script src="../../js/models/City.js"></script>
+    <script src="../../js/services/CityService.js"></script>
+
+    <!-- MANAGERS (dependen de los modelos) -->
+    <script src="../../js/managers/BuildingManager.js"></script>
+    <script src="../../js/managers/CitizenManager.js"></script>
+    <script src="../../js/managers/ResourceManager.js"></script>
+    <script src="../../js/managers/ScoreManager.js"></script>
+    <script src="../../js/managers/TurnSystem.js"></script>
+
+    <!-- SERVICIOS -->
+    <script src="../../js/services/NewsService.js"></script>
+    <script src="../../js/services/WeatherService.js"></script>
+    <script src="../../js/services/RoutingService.js"></script>
+
+    <!-- UI -->
+    <script src="../../js/ui/GridRenderer.js"></script>
+    <script src="../../js/ui/EventHandler.js"></script>
+
+    <!-- UTILS -->
+    <script src="../../js/utils/helpers.js"></script>
+    <script src="../../js/services/CityBuilderStorage.js"></script>
+
+</head>
+
+<body>
+    <!-- ==================== PANTALLA DE INICIO  ====================-->
+    <div id="initial-page" class="screen active">
+        <div class="container min-vh-100 d-flex flex-column justify-content-center align-items-center">
+            <div class="text-center mb-4">
+                <h1 id="game-title">City Builder Game
+                </h1>
+            </div>
+            <div id="buttons" class="d-grid gap-3 col-11 col-sm-8 col-md-6 col-lg-4 mx-auto">
+                <button id="btn-load-game-page" type="button" class="btn btn-primary btn-lg shadow-sm">Cargar
+                    partida</button>
+                <button id="btn-new-city-page" type="button" class="btn btn-light btn-lg shadow-sm">Crear nueva
+                    partida</button>
+                <button id="btn-game-rules-page" type="button" class="btn btn-light btn-lg shadow-sm">Información del
+                    juego</button>
+                <button id="btn-delete-game-page" type="button" class="btn btn-danger btn-lg shadow-sm">Borrar
+                    partida</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PANTALLA CARGAR CIUDAD ==================== -->
+    <div id="load-game-page" class="screen load-game city-creation">
+        <button class="btn btn-black btn-back" id="return">← Volver</button>
+        <div class="create-container">
+            <div class="create-header">
+                <h1 class="screen-title d-flex flex-column justify-content-center text-center">
+                    Cargar partida
+                </h1>
+            </div>
+
+            <div class="form-section">
+                <h2 class="screen-title">Selecciona una ciudad guardada</h2>
+                <div id="saved-games-list" class="list-group">
+                    <h2 class="screen-subtitle">No hay ciudades guardadas</h2>
+                </div>
+
+            </div>
+
+            <div class="d-grid mt-3" id="button-div">
+                <button class="btn-primary btn-xl btn-full" id="btn-load-game">
+                    Cargar Ciudad
+                </button>
+            </div>
+            <div class="d-grid mt-3">
+                <button class="btn-primary btn-xl btn-full" id="btn-load-json">
+                    Importar ciudad desde JSON
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PANTALLA INFORMACION DE JUEGO ==================== -->
+    <div id="game-info-page" class="screen">
+        <button class="btn btn-black btn-back" id="btn-info-back-page">← Volver</button>
+        <div class="create-container">
+            <div class="create-header">
+                <h1 class="screen-title d-flex flex-column justify-content-center text-center">Información del juego
+                </h1>
+            </div>
+            <p class="parragraph-info-page">Asumes el rol de alcalde de una ciudad virtual con el objetivo de hacerla
+                crecer y prosperar. Cuentas con
+                un capital inicial de <span id="dinero">$50,000</span> para comenzar a construir la infraestructura.
+                Las calles deben
+                establecerse antes que cualquier edificio, ya que toda construcción requiere una vía adyacente. Es
+                indispensable que construyas plantas de electricidad y agua para mantener la ciudad en funcionamiento —
+                si alguno de estos recursos se agota, la partida finaliza. La construcción de zonas residenciales te
+                permitirá atraer habitantes, los comercios e industrias les ofrecerán empleo, y los servicios como
+                parques u hospitales mantendrán su bienestar. El juego avanza por turnos: en cada uno se generan
+                recursos, crece la población y se actualiza tu puntuación. Tu desempeño se evalúa en función del tamaño
+                de la ciudad, la economía y la felicidad de tus ciudadanos. Las decisiones que tomes definirán el futuro
+                de tu ciudad.</p>
+        </div>
+    </div>
+
+    <!-- ==================== PANTALLA BORRAR PARTIDA ==================== -->
+    <div id="delete-game-page" class="screen">
+        <button class="btn btn-black btn-back" id="return-page">← Volver</button>
+        <div class="create-container">
+            <div class="create-header">
+                <h1 class="screen-title d-flex flex-column justify-content-center text-center">
+                    Borrar partida
+                </h1>
+            </div>
+            <div class="form-section">
+                <h2 class="screen-title">Selecciona una ciudad guardada</h2>
+                <div id="delete-games-list" class="list-group">
+                    <h2 class="screen-subtitle">No hay ciudades guardadas</h2>
+                </div>
+
+            </div>
+            <div class="d-grid mt-3">
+                <button class="btn-primary btn-xl btn-full" id="delete-game-button">Borrar partida</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PANTALLA CREACIÓN DE CIUDAD ==================== -->
+    <div id="city-info-page" class="screen city-creation">
+        <button class="btn btn-black btn-back" id="btn-back-page">← Volver</button>
+        <div class="create-container">
+            <div class="create-header">
+                <h1 id="title" class="d-flex flex-column justify-content-center align-items-center">
+                    Fundar Nueva Ciudad</h1>
+            </div>
+
+            <!-- Identidad -->
+            <div class="form-section">
+                <h2 class="screen-title">Identidad</h2>
+                <div class="row g-3">
+                    <div class="col-l-12 col-sm-6">
+                        <label
+                            class="screen-subtitle d-flex flex-column justify-content-center align-items-center">Nombre
+                            de la Ciudad</label>
+                        <input type="text" id="input-city-name" class="form-control form-input" maxlength="1000"
+                            placeholder="Ej: Manizales" required />
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <label
+                            class="screen-subtitle d-flex flex-column justify-content-center align-items-center">Nombre
+                            del Alcalde</label>
+                        <input type="text" id="input-mayor-name" class="form-control form-input" maxlength="50"
+                            placeholder="Ingresa un nombre" required />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Región -->
+            <div class="form-section">
+                <h2 class="screen-title">Región Geográfica
+                </h2>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label
+                            class="screen-subtitle form-label d-flex flex-column justify-content-center align-items-center">Ciudad
+                            de Colombia</label>
+                        <select id="input-region" class="form-select form-input">
+                            <option value="" required>— Selecciona una opción —</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuracion del juego -->
+
+            <div class="form-section">
+                <h2 class="screen-title">Configuración del
+                    juego
+                </h2>
+                <div class="row g-3">
+                    <div class="col-12 col-sm-4">
+
+                        <label
+                            class="screen-subtitle d-flex flex-column justify-content-center align-items-center">Tamaño
+                            del Mapa</label>
+                        <div class="range-container">
+                            <input type="range" id="input-map-size" class="screen-subtitle form-range" min="15" max="30"
+                                value=15 step="1" />
+                            <span id="map-size-display" class="screen-title range-display">15×15</span>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <label
+                            class="screen-subtitle form-label d-flex flex-column justify-content-center align-items-center">Duración
+                            del Turno (seg)</label>
+                        <input type="number" id="input-turn-duration" class="form-control form-input" min="5" max="120"
+                            value="5" required />
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <label
+                            class="screen-subtitle form-label d-flex flex-column justify-content-center align-items-center">Tasa
+                            de Crecimiento (ciudadanos/turno)</label>
+                        <input type="number" id="input-growth-rate" class="form-control form-input" min="1" max="10"
+                            value="1" required />
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-4">
+                            <label
+                                class=" screen-subtitle form-label d-flex flex-column justify-content-center align-items-center">Electricidad
+                                inicial</label>
+                            <input type="number" id="input-init-electricity" class="form-control form-input" min="0"
+                                value="0" />
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <label
+                                class="screen-subtitle form-label d-flex flex-column justify-content-center align-items-center">Agua
+                                inicial</label>
+                            <input type="number" id="input-init-water" class="form-control form-input" min="0"
+                                value="0" />
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <label
+                                class="screen-subtitle form-label d-flex flex-column justify-content-center align-items-center">Alimentos
+                                iniciales</label>
+                            <input type="number" id="input-init-food" class="form-control form-input" min="0"
+                                value="0" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acción -->
+            <div class="d-grid mt-3" id="button-div">
+                <button class="btn-primary btn-xl btn-full" id="btn-create-game">
+                    🏗️ Fundar Ciudad
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!--  ==================== PANTALLA DE JUEGO  ====================-->
+    <div id="game-page" class=" screen city-creation">
+        <header id="header">
+            <div id="header-inner">
+
+                <!-- Izquierda: botón + ciudad/alcalde -->
+                <div id="header-left">
+                    <button type="button" id="return-start-page">Menú principal</button>
+                    <br>
+                    <div id="container-city">
+                        <h6 id="city-name"></h6>
+                        <h6 id="city-mayor"></h6>
+                    </div>
+                </div>
+
+                <!-- Centro: título -->
+                <div id="header-center">
+                    <h3 id="screen-title">City Builder Game</h3>
+                </div>
+
+                <!-- Derecha: recursos -->
+                <div id="header-right">
+                    <br>
+                    <div id="resources-edit-panel" class="mb-4">
+                        <span id="money">💵 $50,000</span>
+                        <div class="resource-edit-row">
+                            <label class="resource-edit-label">⚡</label>
+                            <input type="number" id="edit-electricity" class="resource-edit-input" min="0" value="0" />
+                            <button class="resource-edit-btn" data-resource="electricity">✓</button>
+                        </div>
+                        <div class="resource-edit-row">
+                            <label class="resource-edit-label">💧</label>
+                            <input type="number" id="edit-water" class="resource-edit-input" min="0" value="0" />
+                            <button class="resource-edit-btn" data-resource="water">✓</button>
+                        </div>
+                        <div class="resource-edit-row">
+                            <label class="resource-edit-label">🌾</label>
+                            <input type="number" id="edit-food" class="resource-edit-input" min="0" value="0" />
+                            <button class="resource-edit-btn" data-resource="food">✓</button>
+                        </div>
+                        <span id="population">👥 0</span>
+                        <span id="happiness">😊 0%</span>
+                    </div>
+                    <div class="puntuation">
+                        <h5 class="subtitles">Puntuación</h5>
+                        <div id="score-panel">
+                            <h4>0</h4>
+                        </div>
+                    </div>
+
+                </div>
+        </header>
+        <div class="row">
+            <aside class="col-lg-2 bg-light sidebar p-3">
+                <h5 class="subtitles">Construcción</h5>
+
+                <div class="list-group">
+                    <div id="house-actions" class="d-flex flex-row">
+                        <button id="btn-house" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/House.png" data-type="house">Casa</button>
+                        <button class="chevron" data-target="house-info">∨</button>
+                    </div>
+                    <div id="house-info"></div>
+
+                    <div id="apartment-actions" class="d-flex flex-row">
+                        <button id="btn-apartment" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/Apartment.png" data-type="apartment">Apartamento</button>
+                        <button class="chevron" data-target="apartment-info">∨</button>
+                    </div>
+                    <div id="apartment-info"></div>
+
+                    <div id="store-actions" class="d-flex flex-row">
+                        <button id="btn-store" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/Store.png" data-type="store">Tienda</button>
+                        <button class="chevron" data-target="store-info">∨</button>
+                    </div>
+                    <div id="store-info"></div>
+
+                    <div id="mall-actions" class="d-flex flex-row">
+                        <button id="btn-commercial-center" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/Mall.png" data-type="commercial-center">Centro
+                            Comercial</button>
+                        <button class="chevron" data-target="mall-info">∨</button>
+                    </div>
+                    <div id="mall-info"></div>
+
+                    <div id="factory-actions" class="d-flex flex-row">
+                        <button id="btn-factory" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/Factory.png" data-type="factory">Fábrica</button>
+                        <button class="chevron" data-target="factory-info">∨</button>
+                    </div>
+                    <div id="factory-info"></div>
+
+                    <div id="farm-actions" class="d-flex flex-row">
+                        <button id="btn-farm" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/Farm.png" data-type="farm">Granja</button>
+                        <button class="chevron" data-target="farm-info">∨</button>
+                    </div>
+                    <div id="farm-info"></div>
+
+                    <div id="police-actions" class="d-flex flex-row">
+                        <button id="btn-police-station" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/Police-station.png"
+                            data-type="police-station">Policía</button>
+                        <button class="chevron" data-target="police-info">∨</button>
+                    </div>
+                    <div id="police-info"></div>
+
+                    <div id="firestation-actions" class="d-flex flex-row">
+                        <button id="btn-firefighters" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/Firefighter-station.png"
+                            data-type="firefighter-station">Bomberos</button>
+                        <button class="chevron" data-target="firestation-info">∨</button>
+                    </div>
+                    <div id="firestation-info"></div>
+
+                    <div id="hospital-actions" class="d-flex flex-row">
+                        <button id="btn-hospital" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/Hospital.png" data-type="hospital">Hospital</button>
+                        <button class="chevron" data-target="hospital-info">∨</button>
+                    </div>
+                    <div id="hospital-info"></div>
+
+                    <div id="electricPlant-actions" class="d-flex flex-row">
+                        <button id="btn-power-plant" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/Power-plant.png" data-type="power-plant">Planta
+                            Eléctrica</button>
+                        <button class="chevron" data-target="electricPlant-info">∨</button>
+                    </div>
+                    <div id="electricPlant-info"></div>
+
+                    <div id="waterPlant-actions" class="d-flex flex-row">
+                        <button id="btn-water-plant" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/Water-plant.png" data-type="water-plant">Planta de
+                            Agua</button>
+                        <button class="chevron" data-target="waterPlant-info">∨</button>
+                    </div>
+                    <div id="waterPlant-info"></div>
+
+                    <div id="park-actions" class="d-flex flex-row">
+                        <button id="btn-park" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/Park.png" data-type="park">Parque</button>
+                        <button class="chevron" data-target="park-info">∨</button>
+                    </div>
+                    <div id="park-info"></div>
+
+                    <div id="road-actions" class="d-flex flex-row">
+                        <button id="btn-road" class="list-group-item list-group-item-action"
+                            data-image="../../assets/icons/Road.png" data-type="road">Vía</button>
+                        <button class="chevron" data-target="road-info">∨</button>
+                    </div>
+                    <div id="road-info"></div>
+
+                    <button id="btn-demolish" class="list-group-item list-group-item-action text-danger"
+                        data-type="demolish">Demoler</button>
+
+                    <hr>
+                    <button id="btn-route" class="btn btn-primary w-100 mb-2">Calcular Ruta</button>
+                    <button id="export" class="btn btn-warning w-100">Exportar</button>
+                </div>
+            </aside>
+
+            <!-- Mapa Central -->
+            <main id="map-container" class="col-lg-7 p-3">
+                <table id="grid"></table>
+            </main>
+
+            <!-- Sidebar Derecho -->
+            <aside class="col-lg-3 bg-light p-3">
+
+                <h5 class="subtitles">Clima</h5>
+                <div id="weather-widget" class="mb-4">
+                    <p id="city-temperature">Temperatura: -- °C</p>
+                    <p id="city-condition">Condición: --</p>
+                    <p id="city-humidity">Humedad: --%</p>
+                    <p id="city-wind-velocity">Velocidad del viento: --</p>
+                </div>
+
+                <h5 class="subtitles">Noticias</h5>
+                <div id="news-panel">
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h6 id="news-title">Título noticia</h6>
+                            <p id="news-info">Descripción breve...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+            </aside>
+
+        </div>
+    </div>
+
+    <!--  ==================== PANTALLA DE GAME OVER  ====================-->
+    <div id="game-over-page" class="screen city-creation">
+        <div class="game-over-container">
+            <h1 id="game-over-title">⚠ CIUDAD COLAPSADA</h1>
+            <p id="game-over-reason"></p>
+            <p id="game-over-score"></p>
+            <button type="button" id="btn-game-over-menu" class="btn-back">← Volver al menú</button>
+        </div>
+    </div>
+</body>
+
+</html>
