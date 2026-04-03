@@ -1,9 +1,34 @@
 /* panels.css */
 
 /* ===== PANEL DE RECURSOS ===== */
-#resource-panel .d-flex.flex-row {
+#resources-edit-panel {
+    display: flex;
     flex-wrap: wrap;
-    gap: 6px !important;
+    align-items: center;
+    gap: 8px;
+}
+
+.resource-edit-row {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.resource-edit-label {
+    font-size: 0.9rem;
+}
+
+.resource-edit-input {
+    width: 70px;
+    font-size: 0.8rem;
+    padding: 2px 4px;
+}
+
+.resource-edit-btn {
+    font-size: 0.75rem;
+    padding: 2px 6px;
 }
 
 /* ===== PUNTUACIÓN ===== */

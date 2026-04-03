@@ -6,6 +6,10 @@ let selectedButton = null;
 let routeMode = false;
 let routeOrigin = null;
 
+let thereIsCityName = false;
+let thereIsMayorName = false;
+let thereIsRegion = false;
+
 document.addEventListener("DOMContentLoaded", () => {
     let btnNewCityPage = document.getElementById('btn-new-city-page');
     let btnCreateGame = document.getElementById('btn-create-game');
@@ -24,9 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let btnRoute = document.getElementById('btn-route');
     let constructionsInfo = document.querySelectorAll('.chevron');
     let constructionsInfoDivs = document.querySelectorAll('[id$="-info"]')
-
-    const weatherRepository = new WeatherService();
-    const newsRepository = new NewsService();
 
     // =====================================================
 
@@ -111,46 +112,14 @@ document.addEventListener("DOMContentLoaded", () => {
         helpers.importFromJSON();
         helpers.loadCityFromStorage();
     });
-
+    
     inputRegion.addEventListener('change', function () {
         let option = this.options[this.selectedIndex];
         let lat = option.dataset.lat;
         let lon = option.dataset.lon;
-
-        weatherRepository.getWeather(lat, lon)
-            .then(data => {
-                document.getElementById('city-temperature').textContent = `Temperatura: ${data.main.temp}°C`;
-                document.getElementById('city-condition').textContent = `Condición: ${data.weather[0].description}`;
-                document.getElementById('city-humidity').textContent = `Humedad: ${data.main.humidity}%`;
-                document.getElementById('city-wind-velocity').textContent = `Velocidad del viento: ${data.wind.speed}m/s`;
-            })
-            .catch(() => {
-                document.getElementById('city-temperature').textContent = `Temperatura: Error al conseguir temperatura.`;
-                document.getElementById('city-condition').textContent = `Condición: Error al conseguir condición.`;
-            });
-
-        newsRepository.getNews("us")
-            .then(data => {
-                let newsPanel = document.getElementById('news-panel');
-                newsPanel.innerHTML = '';
-                data.articles.slice(0, 5).forEach(article => {
-                    let card = document.createElement('div');
-                    card.className = 'card mb-2';
-                    card.innerHTML = `
-                        <div class="card-body">
-                            <h5 class="article-title">${article.title}</h5>
-                            <p>${article.description}</p>
-                            <a href="${article.url}">Link</a>
-                            <img src="${article.urlToImage}" alt="news image" class="news-image">
-                        </div>
-                    `;
-                    newsPanel.appendChild(card);
-                });
-            })
-            .catch(() => {
-                document.getElementById('news-title').textContent = `Título noticia: Error al conseguir el titulo`;
-                document.getElementById('news-info').textContent = `Descripcion: Error al conseguir descripcion.`;
-            });
+        
+        helpers.getWeatherService(lat, lon);
+        helpers.getNewsService("us");
     });
 
     btnCreateGame.addEventListener('click', () => {

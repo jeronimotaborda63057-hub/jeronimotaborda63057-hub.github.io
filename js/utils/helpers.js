@@ -1,12 +1,25 @@
 class helpers {
     static updateUI() {
-        document.getElementById('money').textContent = `💵 $${city.money}`;
+        const money = document.getElementById('money');
+        money.textContent = `💵 $${city.money}`;
         document.getElementById('edit-electricity').value = `${city.electricity}`;
         document.getElementById('edit-water').value = `${city.water}`;
         document.getElementById('edit-food').value = `${city.food}`;
         document.getElementById('population').textContent = `👥 ${city.population.length}`;
         document.getElementById('happiness').textContent = `😊 ${city.calculateHappiness(city.buildings)}%`;
         document.getElementById('score-panel').textContent = `${city.score}`;
+        
+        money.textContent = `💵 $${city.money}`;
+
+        money.classList.remove('money-green', 'money-yellow', 'money-red');
+
+        if (city.money < 1000) {
+            money.classList.add('money-red');
+        } else if (city.money < 5000) {
+            money.classList.add('money-yellow');
+        } else {
+            money.classList.add('money-green');
+        }
     }
 
     static buildNewBuilding(type, x, y) {
@@ -20,7 +33,7 @@ class helpers {
             city.spendMoney(building);
             city.addBuilding(building);
             city.grid.setCellId(x, y, building.id);
-            document.getElementById('money').textContent = `💵 $${city.money}`;
+            helpers.updateUI()
             return building;
         } else {
             alert("No tienes suficiente dinero para construir esto.");
@@ -51,6 +64,49 @@ class helpers {
                 alert("Error al cargar ciudades")
                 inputRegion.innerHTML = '<option value="">— Error al cargar ciudades —</option>';
             });
+    }
+
+    static getWeatherService(lat, lon){
+        const weatherRepository = new WeatherService();
+        weatherRepository.getWeather(lat, lon)
+        .then(data => {
+            document.getElementById('city-temperature').textContent = `Temperatura: ${data.main.temp}°C`;
+            document.getElementById('city-condition').textContent = `Condición: ${data.weather[0].description}`;
+            document.getElementById('city-humidity').textContent = `Humedad: ${data.main.humidity}%`;
+            document.getElementById('city-wind-velocity').textContent = `Velocidad del viento: ${data.wind.speed}m/s`;
+            thereIsRegion = true;
+            })
+            .catch(() => {
+                document.getElementById('city-temperature').textContent = `Temperatura: Error al conseguir temperatura.`;
+                document.getElementById('city-condition').textContent = `Condición: Error al conseguir condición.`;
+            });
+    }
+
+    static getNewsService(country){
+        const newsRepository = new NewsService();
+        newsRepository.getNews(country)
+            .then(data => {
+                let newsPanel = document.getElementById('news-panel');
+                newsPanel.innerHTML = '';
+                data.articles.slice(0, 5).forEach(article => {
+                    let card = document.createElement('div');
+                    card.className = 'card mb-2';
+                    card.innerHTML = `
+                        <div class="card-body">
+                            <h5 class="article-title">${article.title}</h5>
+                            <p>${article.description}</p>
+                            <a href="${article.url}">Link</a>
+                            <img src="${article.urlToImage}" alt="news image" class="news-image">
+                        </div>
+                    `;
+                    newsPanel.appendChild(card);
+                });
+            })
+            .catch(() => {
+                document.getElementById('news-title').textContent = `Título noticia: Error al conseguir el titulo`;
+                document.getElementById('news-info').textContent = `Descripcion: Error al conseguir descripcion.`;
+            });
+
     }
 
     static showScreen(screen_id) {
@@ -206,10 +262,10 @@ class helpers {
         if (city && city.turnSystem) city.turnSystem.stop();
 
         const gridSize = parseInt(document.getElementById("input-map-size").value);
-        const cityNameInput = document.getElementById('input-city-name');
-        const cityMayorInput = document.getElementById('input-mayor-name');
-        const cityValue = cityNameInput.value.trim();
-        const mayorName = cityMayorInput.value.trim();
+        const cityValue = document.getElementById('input-city-name').value.trim();
+        if (cityValue !== "") thereIsCityName = true;
+        const mayorName = document.getElementById('input-mayor-name').value.trim();
+        if (mayorName !== "") thereIsMayorName = true;
         const cityNameContainer = document.getElementById('city-name');
         const cityMayorNameContainer = document.getElementById('city-mayor')
         let electricity = parseInt(document.getElementById("input-init-electricity").value);
@@ -220,7 +276,10 @@ class helpers {
 
         const grid = new Grid(gridSize, gridSize);
         grid.initGrid();
-
+        if(!thereIsCityName || !thereIsMayorName || !thereIsRegion) {
+            alert("Por favor, ingresa un nombre para la ciudad, el alcalde y selecciona una región.");
+            return;
+        }
         city = new City(cityValue, mayorName, 0, 0, gridSize, gridSize, 0, 0, grid, turnDuration);
         city.turnSystem = new TurnSystem(city, turnDuration);
         city.growthRate = growthRate;

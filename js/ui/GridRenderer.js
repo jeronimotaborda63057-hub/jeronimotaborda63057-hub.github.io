@@ -17,27 +17,28 @@ class GridRenderer {
     };
 
     static render(grid, container) {
-    container.innerHTML = "";
-    let html = "";
+        container.innerHTML = "";
+        let html = "";
 
-    for (let row = 0; row < grid.height; row++) {
-        html += `<tr>`;
-        for (let col = 0; col < grid.width; col++) {
-            const cell = grid.cells[row][col];
-            html += `<td class="cell" data-x="${col}" data-y="${row}">`;
+        for (let row = 0; row < grid.height; row++) {
+            html += `<tr>`;
+            for (let col = 0; col < grid.width; col++) {
+                const cell = grid.cells[row][col];
+                html += `<td class="cell" data-x="${col}" data-y="${row}">`;
 
-            if (cell.id !== "g") {
-                const img = GridRenderer.buildingImages[cell.id];
-                if (img) {
-                    html += `<img src="${img}" class="cell-icon"/>`;
+                if (cell.id !== "g") {
+                    const img = GridRenderer.buildingImages[cell.id];
+                    if (img) {
+                        const isRoad = cell.id === "R";
+                        html += `<img src="${img}" class="cell-icon${isRoad ? ' road-icon' : ''}"/>`;
+                    }
                 }
+
+                html += `</td>`;
             }
-
-            html += `</td>`;
+            html += `</tr>`;
         }
-        html += `</tr>`;
-    }
 
-    container.innerHTML = html;
-}
+        container.innerHTML = html;
+    }
 }

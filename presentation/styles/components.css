@@ -149,9 +149,23 @@
     white-space: nowrap;
 }
 
-#money {
-    color: var(--neon-amber);
+.money-green {
+    color: var(--neon-green) !important;
     border-color: rgba(255, 183, 0, 0.2);
+}
+
+.money-red {
+    color: #ff0033 !important;
+    text-shadow: 0 0 5px #ff0033, 0 0 15px #ff0033, 0 0 30px #ff0033;
+}
+
+.money-yellow {
+    color: #ffcc00 !important;
+    text-shadow:
+        0 0 4px #ffcc00,
+        0 0 10px #ffcc00,
+        0 0 25px #ffcc00,
+        0 0 50px #ffcc0080;
 }
 
 #edit-electricity {
