@@ -4,468 +4,1124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Builder Game</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles/base.css">
-    <link rel="stylesheet" href="styles/typography.css">
-    <link rel="stylesheet" href="styles/buttons.css">
-    <link rel="stylesheet" href="styles/screens.css">
-    <link rel="stylesheet" href="styles/components.css">
-    <link rel="stylesheet" href="styles/panels.css">
-    <link rel="stylesheet" href="styles/map.css">
-    <link rel="stylesheet" href="styles/responsive.css">
+    <title>Artemis II — Guía de Estudio</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0d14;
+            --surface: #111520;
+            --surface2: #161b2e;
+            --border: #1e2640;
+            --accent: #4fc3f7;
+            --accent2: #f97316;
+            --accent3: #a78bfa;
+            --green: #34d399;
+            --red: #f87171;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --tag-fisica: #1e3a5f;
+            --tag-fisica-t: #60a5fa;
+            --tag-mision: #1a3a2e;
+            --tag-mision-t: #34d399;
+            --tag-clave: #3b2a1a;
+            --tag-clave-t: #fb923c;
+            --tag-tecnica: #2d1f4e;
+            --tag-tecnica-t: #a78bfa;
+            --tag-avanzado: #2d1a1a;
+            --tag-avanzado-t: #f87171;
+            --tag-contexto: #1a2d3b;
+            --tag-contexto-t: #67e8f9;
+        }
 
-    <!-- MODELOS BASE (van primero porque los demás dependen de ellos) -->
-    <script src="js/models/Building.js"></script>
-    <script src="js/models/ResidentialBuilding.js"></script>
-    <script src="js/models/CommercialBuilding.js"></script>
-    <script src="js/models/IndustrialBuilding.js"></script>
-    <script src="js/models/ServiceBuilding.js"></script>
-    <script src="js/models/UtilityPlant.js"></script>
-    <script src="js/models/Park.js"></script>
-    <script src="js/models/Road.js"></script>
-    <script src="js/models/Cell.js"></script>
-    <script src="js/models/Grid.js"></script>
-    <script src="js/models/Citizen.js"></script>
-    <script src="js/models/City.js"></script>
-    <script src="js/services/CityService.js"></script>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    <!-- MANAGERS (dependen de los modelos) -->
-    <script src="js/managers/BuildingManager.js"></script>
-    <script src="js/managers/CitizenManager.js"></script>
-    <script src="js/managers/ResourceManager.js"></script>
-    <script src="js/managers/ScoreManager.js"></script>
-    <script src="js/managers/TurnSystem.js"></script>
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
 
-    <!-- SERVICIOS -->
-    <script src="js/services/NewsService.js"></script>
-    <script src="js/services/WeatherService.js"></script>
-    <script src="js/services/RoutingService.js"></script>
+        /* Stars background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
+                radial-gradient(1px 1px at 30% 60%, rgba(255, 255, 255, 0.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 50% 10%, rgba(255, 255, 255, 0.5) 0%, transparent 100%),
+                radial-gradient(1px 1px at 70% 80%, rgba(255, 255, 255, 0.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 85% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
+                radial-gradient(2px 2px at 20% 90%, rgba(255, 255, 255, 0.2) 0%, transparent 100%),
+                radial-gradient(1px 1px at 60% 45%, rgba(255, 255, 255, 0.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 90% 70%, rgba(255, 255, 255, 0.2) 0%, transparent 100%),
+                radial-gradient(1px 1px at 5% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 100%),
+                radial-gradient(2px 2px at 42% 75%, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
 
-    <!-- UI -->
-    <script src="js/ui/GridRenderer.js"></script>
-    <script src="js/ui/EventHandler.js"></script>
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 24px 100px;
+            position: relative;
+            z-index: 1;
+        }
 
-    <!-- UTILS -->
-    <script src="js/utils/helpers.js"></script>
-    <script src="js/services/CityBuilderStorage.js"></script>
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 70px;
+            padding: 60px 0 40px;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
 
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .mission-badge {
+            display: inline-block;
+            background: rgba(79, 195, 247, 0.1);
+            border: 1px solid rgba(79, 195, 247, 0.3);
+            color: var(--accent);
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 3px;
+            padding: 6px 16px;
+            border-radius: 2px;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #e2e8f0 0%, var(--accent) 60%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        /* Section headers */
+        .session-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 60px 0 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .session-label {
+            font-family: 'Fraunces', serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .session-time {
+            font-size: 12px;
+            color: var(--accent);
+            background: rgba(79, 195, 247, 0.1);
+            border: 1px solid rgba(79, 195, 247, 0.2);
+            padding: 3px 10px;
+            border-radius: 2px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 28px 32px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: rgba(79, 195, 247, 0.3);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent), transparent);
+        }
+
+        .card-number {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 48px;
+            font-family: 'Fraunces', serif;
+            font-weight: 900;
+            color: rgba(79, 195, 247, 0.06);
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .card h3 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #f1f5f9;
+        }
+
+        .card p {
+            color: #94a3b8;
+            margin-bottom: 14px;
+            font-size: 13.5px;
+        }
+
+        /* Tags */
+        .tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .tag {
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 2px;
+            font-weight: 700;
+        }
+
+        .tag.fisica {
+            background: var(--tag-fisica);
+            color: var(--tag-fisica-t);
+        }
+
+        .tag.mision {
+            background: var(--tag-mision);
+            color: var(--tag-mision-t);
+        }
+
+        .tag.clave {
+            background: var(--tag-clave);
+            color: var(--tag-clave-t);
+        }
+
+        .tag.tecnica {
+            background: var(--tag-tecnica);
+            color: var(--tag-tecnica-t);
+        }
+
+        .tag.avanzado {
+            background: var(--tag-avanzado);
+            color: var(--tag-avanzado-t);
+        }
+
+        .tag.contexto {
+            background: var(--tag-contexto);
+            color: var(--tag-contexto-t);
+        }
+
+        /* Calc blocks */
+        .calc-block {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin: 28px 0;
+            overflow: hidden;
+        }
+
+        .calc-block-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            padding: 22px 28px 16px;
+            color: #f1f5f9;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .calc-block-title .tag {
+            font-size: 9px;
+        }
+
+        .calc-block-intro {
+            padding: 16px 28px;
+            color: #94a3b8;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .calc-section {
+            padding: 14px 28px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .calc-section:last-child {
+            border-bottom: none;
+        }
+
+        .calc-section-label {
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .formula-box {
+            background: rgba(79, 195, 247, 0.06);
+            border: 1px solid rgba(79, 195, 247, 0.15);
+        }
+
+        .data-box {
+            background: rgba(52, 211, 153, 0.04);
+            border: 1px solid rgba(52, 211, 153, 0.12);
+        }
+
+        .data-box .calc-section-label {
+            color: var(--green);
+        }
+
+        .sust-box {
+            background: rgba(167, 139, 250, 0.04);
+            border: 1px solid rgba(167, 139, 250, 0.12);
+        }
+
+        .sust-box .calc-section-label {
+            color: var(--accent3);
+        }
+
+        .result-box {
+            background: rgba(248, 113, 113, 0.06);
+            border: 1px solid rgba(248, 113, 113, 0.15);
+        }
+
+        .result-box .calc-section-label {
+            color: var(--red);
+        }
+
+        .extra-box {
+            background: rgba(79, 195, 247, 0.03);
+            border: 1px solid rgba(79, 195, 247, 0.08);
+        }
+
+        .extra-box .calc-section-label {
+            color: var(--accent);
+        }
+
+        code {
+            display: block;
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            line-height: 2;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+        }
+
+        .result-value {
+            font-family: 'Fraunces', serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--red);
+            line-height: 1.3;
+        }
+
+        .note-box {
+            background: rgba(251, 191, 36, 0.05);
+            border: 1px solid rgba(251, 191, 36, 0.15);
+            border-radius: 4px;
+            padding: 14px 18px;
+            margin: 10px 0;
+            font-size: 13px;
+            color: #fbbf24;
+        }
+
+        .debate-box {
+            background: rgba(167, 139, 250, 0.05);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            border-radius: 4px;
+            padding: 14px 18px;
+            margin: 10px 0;
+            font-size: 13px;
+            color: var(--accent3);
+        }
+
+        .debate-box::before {
+            content: '💬 Debate: ';
+            font-weight: 700;
+        }
+
+        /* Divider */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 50px 0;
+        }
+
+        /* Index */
+        .index {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 28px 32px;
+            margin-bottom: 60px;
+        }
+
+        .index h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.1rem;
+            color: var(--muted);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .index-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 32px;
+            list-style: none;
+        }
+
+        .index-list li a {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .index-list li a:hover {
+            color: var(--accent);
+        }
+
+        .index-list li a::before {
+            content: '→';
+            color: var(--accent);
+        }
+
+        @media (max-width: 600px) {
+            .index-list {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 40px 16px 60px;
+            }
+
+            .card {
+                padding: 20px 20px;
+            }
+
+            .calc-section {
+                padding: 12px 20px;
+            }
+
+            .calc-block-title {
+                padding: 18px 20px 12px;
+            }
+        }
+
+        strong {
+            color: #f1f5f9;
+        }
+    </style>
 </head>
 
 <body>
-    <!-- ==================== PANTALLA DE INICIO  ====================-->
-    <div id="initial-page" class="screen active">
-        <div class="container min-vh-100 d-flex flex-column justify-content-center align-items-center">
-            <div class="text-center mb-4">
-                <h1 id="game-title">City Builder Game
-                </h1>
-            </div>
-            <div id="buttons" class="d-grid gap-3 col-11 col-sm-8 col-md-6 col-lg-4 mx-auto">
-                <button id="btn-load-game-page" type="button" class="btn btn-primary btn-lg shadow-sm">Cargar
-                    partida</button>
-                <button id="btn-new-city-page" type="button" class="btn btn-light btn-lg shadow-sm">Crear nueva
-                    partida</button>
-                <button id="btn-game-rules-page" type="button" class="btn btn-light btn-lg shadow-sm">Información del
-                    juego</button>
-                <button id="btn-delete-game-page" type="button" class="btn btn-danger btn-lg shadow-sm">Borrar
-                    partida</button>
-            </div>
-        </div>
-    </div>
+    <div class="container">
 
-    <!-- ==================== PANTALLA CARGAR CIUDAD ==================== -->
-    <div id="load-game-page" class="screen load-game city-creation">
-        <button class="btn btn-black btn-back" id="return">← Volver</button>
-        <div class="create-container">
-            <div class="create-header">
-                <h1 class="screen-title d-flex flex-column justify-content-center text-center">
-                    Cargar partida
-                </h1>
-            </div>
-
-            <div class="form-section">
-                <h2 class="screen-title">Selecciona una ciudad guardada</h2>
-                <div id="saved-games-list" class="list-group">
-                    <h2 class="screen-subtitle">No hay ciudades guardadas</h2>
-                </div>
-
-            </div>
-
-            <div class="d-grid mt-3" id="button-div">
-                <button class="btn-primary btn-xl btn-full" id="btn-load-game">
-                    Cargar Ciudad
-                </button>
-            </div>
-            <div class="d-grid mt-3">
-                <button class="btn-primary btn-xl btn-full" id="btn-load-json">
-                    Importar ciudad desde JSON
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== PANTALLA INFORMACION DE JUEGO ==================== -->
-    <div id="game-info-page" class="screen">
-        <button class="btn btn-black btn-back" id="btn-info-back-page">← Volver</button>
-        <div class="create-container">
-            <div class="create-header">
-                <h1 class="screen-title d-flex flex-column justify-content-center text-center">Información del juego
-                </h1>
-            </div>
-            <p class="parragraph-info-page">Asumes el rol de alcalde de una ciudad virtual con el objetivo de hacerla
-                crecer y prosperar. Cuentas con
-                un capital inicial de <span id="dinero">$50,000</span> para comenzar a construir la infraestructura.
-                Las calles deben
-                establecerse antes que cualquier edificio, ya que toda construcción requiere una vía adyacente. Es
-                indispensable que construyas plantas de electricidad y agua para mantener la ciudad en funcionamiento —
-                si alguno de estos recursos se agota, la partida finaliza. La construcción de zonas residenciales te
-                permitirá atraer habitantes, los comercios e industrias les ofrecerán empleo, y los servicios como
-                parques u hospitales mantendrán su bienestar. El juego avanza por turnos: en cada uno se generan
-                recursos, crece la población y se actualiza tu puntuación. Tu desempeño se evalúa en función del tamaño
-                de la ciudad, la economía y la felicidad de tus ciudadanos. Las decisiones que tomes definirán el futuro
-                de tu ciudad.</p>
-        </div>
-    </div>
-
-    <!-- ==================== PANTALLA BORRAR PARTIDA ==================== -->
-    <div id="delete-game-page" class="screen">
-        <button class="btn btn-black btn-back" id="return-page">← Volver</button>
-        <div class="create-container">
-            <div class="create-header">
-                <h1 class="screen-title d-flex flex-column justify-content-center text-center">
-                    Borrar partida
-                </h1>
-            </div>
-            <div class="form-section">
-                <h2 class="screen-title">Selecciona una ciudad guardada</h2>
-                <div id="delete-games-list" class="list-group">
-                    <h2 class="screen-subtitle">No hay ciudades guardadas</h2>
-                </div>
-
-            </div>
-            <div class="d-grid mt-3">
-                <button class="btn-primary btn-xl btn-full" id="delete-game-button">Borrar partida</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== PANTALLA CREACIÓN DE CIUDAD ==================== -->
-    <div id="city-info-page" class="screen city-creation">
-        <button class="btn btn-black btn-back" id="btn-back-page">← Volver</button>
-        <div class="create-container">
-            <div class="create-header">
-                <h1 id="title" class="d-flex flex-column justify-content-center align-items-center">
-                    Fundar Nueva Ciudad</h1>
-            </div>
-
-            <!-- Identidad -->
-            <div class="form-section">
-                <h2 class="screen-title">Identidad</h2>
-                <div class="row g-3">
-                    <div class="col-l-12 col-sm-6">
-                        <label
-                            class="screen-subtitle d-flex flex-column justify-content-center align-items-center">Nombre
-                            de la Ciudad</label>
-                        <input type="text" id="input-city-name" class="form-control form-input" maxlength="1000"
-                            placeholder="Ej: Manizales" required />
-                    </div>
-                    <div class="col-12 col-sm-6">
-                        <label
-                            class="screen-subtitle d-flex flex-column justify-content-center align-items-center">Nombre
-                            del Alcalde</label>
-                        <input type="text" id="input-mayor-name" class="form-control form-input" maxlength="50"
-                            placeholder="Ingresa un nombre" required />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Región -->
-            <div class="form-section">
-                <h2 class="screen-title">Región Geográfica
-                </h2>
-                <div class="row g-3">
-                    <div class="col-12">
-                        <label
-                            class="screen-subtitle form-label d-flex flex-column justify-content-center align-items-center">Ciudad
-                            de Colombia</label>
-                        <select id="input-region" class="form-select form-input">
-                            <option value="" required>— Selecciona una opción —</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Configuracion del juego -->
-
-            <div class="form-section">
-                <h2 class="screen-title">Configuración del
-                    juego
-                </h2>
-                <div class="row g-3">
-                    <div class="col-12 col-sm-4">
-
-                        <label
-                            class="screen-subtitle d-flex flex-column justify-content-center align-items-center">Tamaño
-                            del Mapa</label>
-                        <div class="range-container">
-                            <input type="range" id="input-map-size" class="screen-subtitle form-range" min="15" max="30"
-                                value=15 step="1" />
-                            <span id="map-size-display" class="screen-title range-display">15×15</span>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-4">
-                        <label
-                            class="screen-subtitle form-label d-flex flex-column justify-content-center align-items-center">Duración
-                            del Turno (seg)</label>
-                        <input type="number" id="input-turn-duration" class="form-control form-input" min="5" max="120"
-                            value="5" required />
-                    </div>
-                    <div class="col-12 col-sm-4">
-                        <label
-                            class="screen-subtitle form-label d-flex flex-column justify-content-center align-items-center">Tasa
-                            de Crecimiento (ciudadanos/turno)</label>
-                        <input type="number" id="input-growth-rate" class="form-control form-input" min="1" max="10"
-                            value="1" required />
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-12 col-sm-4">
-                            <label
-                                class=" screen-subtitle form-label d-flex flex-column justify-content-center align-items-center">Electricidad
-                                inicial</label>
-                            <input type="number" id="input-init-electricity" class="form-control form-input" min="0"
-                                value="0" />
-                        </div>
-                        <div class="col-12 col-sm-4">
-                            <label
-                                class="screen-subtitle form-label d-flex flex-column justify-content-center align-items-center">Agua
-                                inicial</label>
-                            <input type="number" id="input-init-water" class="form-control form-input" min="0"
-                                value="0" />
-                        </div>
-                        <div class="col-12 col-sm-4">
-                            <label
-                                class="screen-subtitle form-label d-flex flex-column justify-content-center align-items-center">Alimentos
-                                iniciales</label>
-                            <input type="number" id="input-init-food" class="form-control form-input" min="0"
-                                value="0" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Acción -->
-            <div class="d-grid mt-3" id="button-div">
-                <button class="btn-primary btn-xl btn-full" id="btn-create-game">
-                    🏗️ Fundar Ciudad
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!--  ==================== PANTALLA DE JUEGO  ====================-->
-    <div id="game-page" class=" screen city-creation">
-        <header id="header">
-            <div id="header-inner">
-
-                <!-- Izquierda: botón + ciudad/alcalde -->
-                <div id="header-left">
-                    <button type="button" id="return-start-page">Menú principal</button>
-                    <br>
-                    <div id="container-city">
-                        <h6 id="city-name"></h6>
-                        <h6 id="city-mayor"></h6>
-                    </div>
-                </div>
-
-                <!-- Centro: título -->
-                <div id="header-center">
-                    <h3 id="screen-title">City Builder Game</h3>
-                </div>
-
-                <!-- Derecha: recursos -->
-                <div id="header-right">
-                    <br>
-                    <div id="resources-edit-panel" class="mb-4">
-                        <span id="money">💵 $50,000</span>
-                        <div class="resource-edit-row">
-                            <label class="resource-edit-label">⚡</label>
-                            <input type="number" id="edit-electricity" class="resource-edit-input" min="0" value="0" />
-                            <button class="resource-edit-btn" data-resource="electricity">✓</button>
-                        </div>
-                        <div class="resource-edit-row">
-                            <label class="resource-edit-label">💧</label>
-                            <input type="number" id="edit-water" class="resource-edit-input" min="0" value="0" />
-                            <button class="resource-edit-btn" data-resource="water">✓</button>
-                        </div>
-                        <div class="resource-edit-row">
-                            <label class="resource-edit-label">🌾</label>
-                            <input type="number" id="edit-food" class="resource-edit-input" min="0" value="0" />
-                            <button class="resource-edit-btn" data-resource="food">✓</button>
-                        </div>
-                        <span id="population">👥 0</span>
-                        <span id="happiness">😊 0%</span>
-                    </div>
-                    <div class="puntuation">
-                        <h5 class="subtitles">Puntuación</h5>
-                        <div id="score-panel">
-                            <h4>0</h4>
-                        </div>
-                    </div>
-
-                </div>
+        <!-- HEADER -->
+        <header class="header">
+            <div class="mission-badge">NASA Artemis Program · 2026</div>
+            <h1>Artemis II<br>Guía de Estudio</h1>
+            <p class="subtitle">Física orbital · Mecánica de misión · Cálculos completos</p>
         </header>
-        <div class="row">
-            <aside class="col-lg-2 bg-light sidebar p-3">
-                <h5 class="subtitles">Construcción</h5>
 
-                <div class="list-group">
-                    <div id="house-actions" class="d-flex flex-row">
-                        <button id="btn-house" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/House.png" data-type="house">Casa</button>
-                        <button class="chevron" data-target="house-info">∨</button>
-                    </div>
-                    <div id="house-info"></div>
-
-                    <div id="apartment-actions" class="d-flex flex-row">
-                        <button id="btn-apartment" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/Apartment.png" data-type="apartment">Apartamento</button>
-                        <button class="chevron" data-target="apartment-info">∨</button>
-                    </div>
-                    <div id="apartment-info"></div>
-
-                    <div id="store-actions" class="d-flex flex-row">
-                        <button id="btn-store" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/Store.png" data-type="store">Tienda</button>
-                        <button class="chevron" data-target="store-info">∨</button>
-                    </div>
-                    <div id="store-info"></div>
-
-                    <div id="mall-actions" class="d-flex flex-row">
-                        <button id="btn-commercial-center" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/Mall.png" data-type="commercial-center">Centro
-                            Comercial</button>
-                        <button class="chevron" data-target="mall-info">∨</button>
-                    </div>
-                    <div id="mall-info"></div>
-
-                    <div id="factory-actions" class="d-flex flex-row">
-                        <button id="btn-factory" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/Factory.png" data-type="factory">Fábrica</button>
-                        <button class="chevron" data-target="factory-info">∨</button>
-                    </div>
-                    <div id="factory-info"></div>
-
-                    <div id="farm-actions" class="d-flex flex-row">
-                        <button id="btn-farm" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/Farm.png" data-type="farm">Granja</button>
-                        <button class="chevron" data-target="farm-info">∨</button>
-                    </div>
-                    <div id="farm-info"></div>
-
-                    <div id="police-actions" class="d-flex flex-row">
-                        <button id="btn-police-station" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/Police-station.png"
-                            data-type="police-station">Policía</button>
-                        <button class="chevron" data-target="police-info">∨</button>
-                    </div>
-                    <div id="police-info"></div>
-
-                    <div id="firestation-actions" class="d-flex flex-row">
-                        <button id="btn-firefighters" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/Firefighter-station.png"
-                            data-type="firefighter-station">Bomberos</button>
-                        <button class="chevron" data-target="firestation-info">∨</button>
-                    </div>
-                    <div id="firestation-info"></div>
-
-                    <div id="hospital-actions" class="d-flex flex-row">
-                        <button id="btn-hospital" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/Hospital.png" data-type="hospital">Hospital</button>
-                        <button class="chevron" data-target="hospital-info">∨</button>
-                    </div>
-                    <div id="hospital-info"></div>
-
-                    <div id="electricPlant-actions" class="d-flex flex-row">
-                        <button id="btn-power-plant" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/Power-plant.png" data-type="power-plant">Planta
-                            Eléctrica</button>
-                        <button class="chevron" data-target="electricPlant-info">∨</button>
-                    </div>
-                    <div id="electricPlant-info"></div>
-
-                    <div id="waterPlant-actions" class="d-flex flex-row">
-                        <button id="btn-water-plant" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/Water-plant.png" data-type="water-plant">Planta de
-                            Agua</button>
-                        <button class="chevron" data-target="waterPlant-info">∨</button>
-                    </div>
-                    <div id="waterPlant-info"></div>
-
-                    <div id="park-actions" class="d-flex flex-row">
-                        <button id="btn-park" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/Park.png" data-type="park">Parque</button>
-                        <button class="chevron" data-target="park-info">∨</button>
-                    </div>
-                    <div id="park-info"></div>
-
-                    <div id="road-actions" class="d-flex flex-row">
-                        <button id="btn-road" class="list-group-item list-group-item-action"
-                            data-image="../../assets/icons/Road.png" data-type="road">Vía</button>
-                        <button class="chevron" data-target="road-info">∨</button>
-                    </div>
-                    <div id="road-info"></div>
-
-                    <button id="btn-demolish" class="list-group-item list-group-item-action text-danger"
-                        data-type="demolish">Demoler</button>
-
-                    <hr>
-                    <button id="btn-route" class="btn btn-primary w-100 mb-2">Calcular Ruta</button>
-                    <button id="export" class="btn btn-warning w-100">Exportar</button>
-                </div>
-            </aside>
-
-            <!-- Mapa Central -->
-            <main id="map-container" class="col-lg-7 p-3">
-                <table id="grid"></table>
-            </main>
-
-            <!-- Sidebar Derecho -->
-            <aside class="col-lg-3 bg-light p-3">
-
-                <h5 class="subtitles">Clima</h5>
-                <div id="weather-widget" class="mb-4">
-                    <p id="city-temperature">Temperatura: -- °C</p>
-                    <p id="city-condition">Condición: --</p>
-                    <p id="city-humidity">Humedad: --%</p>
-                    <p id="city-wind-velocity">Velocidad del viento: --</p>
-                </div>
-
-                <h5 class="subtitles">Noticias</h5>
-                <div id="news-panel">
-                    <div class="card mb-2">
-                        <div class="card-body">
-                            <h6 id="news-title">Título noticia</h6>
-                            <p id="news-info">Descripción breve...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <hr>
-
-            </aside>
-
+        <!-- INDEX -->
+        <div class="index">
+            <h2>Contenidos</h2>
+            <ul class="index-list">
+                <li><a href="#plan">Plan de estudio</a></li>
+                <li><a href="#mision">Misión Artemis II</a></li>
+                <li><a href="#v-orbital">Velocidad orbital en LEO</a></li>
+                <li><a href="#v-escape">Velocidad de escape</a></li>
+                <li><a href="#tli">Maniobra TLI · Δv</a></li>
+                <li><a href="#gravedad">Aceleración gravitacional variable</a></li>
+                <li><a href="#neutro">Punto neutro Tierra-Luna</a></li>
+                <li><a href="#luna-orbital">Velocidad orbital de la Luna</a></li>
+                <li><a href="#pericynthion">Flyby en pericynthion</a></li>
+                <li><a href="#kepler">Leyes de Kepler</a></li>
+            </ul>
         </div>
-    </div>
 
-    <!--  ==================== PANTALLA DE GAME OVER  ====================-->
-    <div id="game-over-page" class="screen city-creation">
-        <div class="game-over-container">
-            <h1 id="game-over-title">⚠ CIUDAD COLAPSADA</h1>
-            <p id="game-over-reason"></p>
-            <p id="game-over-score"></p>
-            <button type="button" id="btn-game-over-menu" class="btn-back">← Volver al menú</button>
+        <!-- ══════════════════════════════════════════
+       BLOQUE I — PLAN DE ESTUDIO
+  ══════════════════════════════════════════ -->
+        <section id="plan">
+
+            <!-- MAÑANA DÍA 1 -->
+            <div class="session-header">
+                <span class="session-label">Mañana — Sesión 1</span>
+                <span class="session-time">4–5 h</span>
+            </div>
+
+            <div class="card">
+                <div class="card-number">1</div>
+                <h3>Velocidad orbital y de escape</h3>
+                <p>Fórmulas centrales: <strong>v_orbital = √(GM/r)</strong> y <strong>v_escape = √(2GM/r)</strong>. Para
+                    la Tierra en LEO: ~7.9 km/s. Para escapar: ~11.2 km/s. Entiende por qué v_escape = √2 · v_orbital.
+                    El SLS llevó al Orion a ~10.9 km/s con el TLI.</p>
+                <div class="tags"><span class="tag fisica">física</span><span class="tag clave">clave</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">2</div>
+                <h3>Vectores en la misión</h3>
+                <p>Domina la tabla: <strong>vector posición r⃗</strong>, <strong>velocidad v⃗</strong>,
+                    <strong>aceleración a⃗</strong> (causada por gravedad multibody) y <strong>thrust F⃗</strong>
+                    (durante quemas). Para cada maniobra: ¿qué vector cambia y en qué dirección?
+                </p>
+                <div class="tags"><span class="tag fisica">física</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">3</div>
+                <h3>La maniobra TLI</h3>
+                <p>Trans-Lunar Injection: quema del motor que aumenta v desde ~7.9 km/s hasta ~10.9 km/s. El vector
+                    velocidad se alinea tangencialmente para 'escapar' la esfera de influencia terrestre. Calcula el Δv
+                    aproximado.</p>
+                <div class="tags"><span class="tag mision">misión</span><span class="tag fisica">física</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">4</div>
+                <h3>Aceleración gravitacional variable</h3>
+                <p>g = GM/r². A medida que el Orion se aleja, la aceleración disminuye. Cerca de la Tierra: 9.8 m/s². A
+                    mitad de camino (~192,000 km): ~0.26 m/s². En el punto L1 Tierra-Luna: g_tierra = g_luna (fuerza
+                    neta = 0 en esa dirección).</p>
+                <div class="tags"><span class="tag fisica">física</span><span class="tag avanzado">avanzado</span></div>
+            </div>
+
+            <!-- TARDE DÍA 1 -->
+            <div class="session-header">
+                <span class="session-label">Tarde — Sesión 1</span>
+                <span class="session-time">2–3 h</span>
+            </div>
+
+            <div class="card">
+                <div class="card-number">1</div>
+                <h3>Las Leyes de Kepler aplicadas</h3>
+                <p><strong>1ª:</strong> Órbitas elípticas (no circulares). <strong>2ª:</strong> La nave barre áreas
+                    iguales en tiempos iguales — más rápida cerca de un cuerpo. <strong>3ª:</strong> T² ∝ a³. Identifica
+                    en qué momento de la misión va más rápido y por qué.</p>
+                <div class="tags"><span class="tag fisica">física</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">2</div>
+                <h3>Preguntas de profe: practica estas</h3>
+                <p><em>"¿La nave acelera o desacelera camino a la Luna?"</em> → Desacelera por g de la Tierra, luego
+                    acelera por g de la Luna. <em>"¿Por qué la trayectoria no es línea recta?"</em> → Fuerzas
+                    gravitacionales múltiples la curvan constantemente.</p>
+                <div class="tags"><span class="tag tecnica">técnica</span><span class="tag clave">clave</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">3</div>
+                <h3>Haz los cálculos a mano</h3>
+                <p>Calcula v_orbital para LEO (r = 6371 + 185 km), v_escape, y compara con los 10.9 km/s del TLI.
+                    Entiende por qué no llegan a 11.2 km/s: <strong>no necesitan escapar completamente, solo alcanzar la
+                        órbita lunar.</strong></p>
+                <div class="tags"><span class="tag tecnica">técnica</span></div>
+            </div>
+
+            <!-- MAÑANA DÍA 2 — PROFUNDIZACIÓN -->
+            <div class="session-header">
+                <span class="session-label">Mañana — Profundización</span>
+                <span class="session-time">3 h</span>
+            </div>
+
+            <div class="card">
+                <div class="card-number">1</div>
+                <h3>Derívate las fórmulas, no solo las memorices</h3>
+                <p><strong>Para v_orbital:</strong> iguala fuerza gravitacional con fuerza centrípeta: GMm/r² = mv²/r →
+                    v = √(GM/r).<br><strong>Para v_escape:</strong> iguala energía cinética con potencial gravitacional:
+                    ½mv² = GMm/r → v = √(2GM/r). Ser capaz de derivarlas impresiona.</p>
+                <div class="tags"><span class="tag fisica">física</span><span class="tag clave">clave</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">2</div>
+                <h3>Calcula el Δv de cada maniobra</h3>
+                <p>Δv es el cambio de velocidad de una maniobra. TLI: Δv ≈ 3.1 km/s (de ~7.9 a ~10.9 km/s). Entiende que
+                    el combustible es proporcional al Δv — <strong>ecuación de Tsiolkovsky: Δv = v_e ·
+                        ln(m₀/m_f)</strong>.</p>
+                <div class="tags"><span class="tag fisica">física</span><span class="tag avanzado">avanzado</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">3</div>
+                <h3>La esfera de influencia gravitacional</h3>
+                <p>La Tierra domina gravitacionalmente hasta ~929,000 km (radio de Hill). La Luna domina dentro de
+                    ~66,000 km. Entre esas esferas, ambos cuerpos ejercen fuerza significativa. La nave 'entra' en la
+                    esfera lunar cuando la aceleración lunar supera la terrestre.</p>
+                <div class="tags"><span class="tag fisica">física</span></div>
+            </div>
+
+            <!-- MAÑANA DÍA 3 — MISIÓN ESPECÍFICA -->
+            <div class="session-header">
+                <span class="session-label">Mañana — Misión específica</span>
+                <span class="session-time">3 h</span>
+            </div>
+
+            <div class="card">
+                <div class="card-number">1</div>
+                <h3>Datos del flyby lunar (6 abril 2026)</h3>
+                <p>Altitud de pericynthion: <strong>6,545 km</strong>. Duración del flyby: <strong>~8 horas</strong> de
+                    observaciones. La cara oculta de la Luna fue visible. El spacecraft tracking fue interrumpido
+                    durante la cara oculta. Estos detalles muestran dominio real del tema.</p>
+                <div class="tags"><span class="tag mision">misión</span><span class="tag clave">clave</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">2</div>
+                <h3>¿Por qué free-return y no ir directo?</h3>
+                <p><strong>Ventajas físicas:</strong> no requiere quema de inserción lunar (ahorra ~1 km/s Δv). Si falla
+                    el motor, la tripulación regresa sola. <strong>Desventaja:</strong> no puede aterrizar. Es un
+                    balance ingeniería-seguridad-física que la NASA eligió conscientemente.</p>
+                <div class="tags"><span class="tag fisica">física</span><span class="tag mision">misión</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">3</div>
+                <h3>El papel del SLS vs el Orion</h3>
+                <p><strong>SLS (Space Launch System):</strong> el cohete. Hace el trabajo de lanzamiento y TLI.
+                    <strong>Orion:</strong> la cápsula tripulada. Después del TLI, el SLS ya no opera. El Orion vuela
+                    solo con pequeños propulsores de ajuste. Distinguirlos muestra precisión técnica.
+                </p>
+                <div class="tags"><span class="tag mision">misión</span></div>
+            </div>
+
+            <!-- TARDE DÍA 3 -->
+            <div class="session-header">
+                <span class="session-label">Tarde — Sesión 3</span>
+                <span class="session-time">2–3 h</span>
+            </div>
+
+            <div class="card">
+                <div class="card-number">1</div>
+                <h3>Tripulación y datos reales</h3>
+                <p>4 astronautas a bordo del Orion 'Integrity'. Primera misión tripulada del programa Artemis. El 6 de
+                    abril de 2026 realizaron observaciones científicas durante el flyby durante ~8 horas. Conoce sus
+                    nombres.</p>
+                <div class="tags"><span class="tag mision">misión</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">2</div>
+                <h3>Las efemérides: qué son y por qué importan</h3>
+                <p>Una efeméride es una tabla que predice la posición de un cuerpo celeste en el tiempo. La NASA las usa
+                    para planificar la intercepción con la Luna. Son producto de mecánica orbital y observación
+                    astronómica acumulada. <strong>Menciona JPL Horizons en el debate.</strong></p>
+                <div class="tags"><span class="tag fisica">física</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">3</div>
+                <h3>Prepara el contexto del debate</h3>
+                <p>Sé el que conecta física con misión: cuando un compañero explique la fórmula de velocidad orbital, tú
+                    añade 'y por eso en la fase TLI el SLS aumentó la velocidad a X km/s'. Conoce los datos numéricos de
+                    la misión para apoyar los argumentos físicos.</p>
+                <div class="tags"><span class="tag tecnica">técnica</span></div>
+            </div>
+
+            <div class="card" style="border-color: rgba(249,115,22,0.3);">
+                <div class="card-number">✦</div>
+                <h3>Contexto: Artemis II completa</h3>
+                <p><strong>1 abril 2026:</strong> lanzamiento desde KSC. Orion + SLS. Primeras horas: LEO a ~185 km.
+                    Quema TLI. ~4 días de trayectoria. <strong>6 abril:</strong> flyby lunar a 6,545 km (pericynthion).
+                    Regreso a Tierra. Entiende cada hito.</p>
+                <div class="tags"><span class="tag mision">misión</span><span class="tag clave">clave</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">★</div>
+                <h3>¿Por qué no aterrizan en la Luna?</h3>
+                <p>Artemis II es misión de <strong>prueba tripulada del sistema completo</strong>. Objetivo: verificar
+                    Orion con humanos, free-return como seguridad. <strong>Artemis III (2027+)</strong> será el
+                    alunizaje. Importante diferenciarlo en el debate.</p>
+                <div class="tags"><span class="tag mision">misión</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">◆</div>
+                <h3>Comparación con Apollo 13</h3>
+                <p>Apollo 13 también usó free-return tras la explosión — pero a solo 251 km de la Luna. Artemis II pasó
+                    a 6,545 km. Ambas usan la misma física (gravedad lunar como 'catapulta'), pero <strong>Artemis II
+                        nunca estuvo en peligro: es su trayectoria nominal.</strong></p>
+                <div class="tags"><span class="tag contexto">contexto</span><span class="tag clave">clave</span></div>
+            </div>
+
+            <div class="card">
+                <div class="card-number">∞</div>
+                <h3>¿Cómo 'encontraron' la Luna?</h3>
+                <p>La Luna se mueve ~1 km/s en su órbita. La NASA calculó dónde estaría 4 días después del lanzamiento
+                    usando <strong>efemérides</strong> (tablas de posición futura de cuerpos celestes). El software
+                    <strong>JPL Horizons</strong> y <strong>Copernicus</strong> hacen esto con integración numérica.
+                </p>
+                <div class="tags"><span class="tag fisica">física</span><span class="tag clave">clave</span></div>
+            </div>
+
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- ══════════════════════════════════════════
+       BLOQUE II — CÁLCULOS COMPLETOS
+  ══════════════════════════════════════════ -->
+
+        <div class="session-header" style="margin-top:0">
+            <span class="session-label">Cálculos detallados</span>
+            <span class="session-time">Física</span>
         </div>
+
+        <!-- CÁLCULO 1: V ORBITAL LEO -->
+        <div class="calc-block" id="v-orbital">
+            <div class="calc-block-title">
+                Velocidad orbital en LEO
+                <span class="tag fisica">física</span>
+            </div>
+            <div class="calc-block-intro">
+                El Orion orbita la Tierra a 185 km de altitud antes del TLI. ¿A qué velocidad debe ir para mantenerse en
+                órbita estable? Se iguala la fuerza gravitacional con la fuerza centrípeta: GMm/r² = mv²/r, y se despeja
+                v.
+            </div>
+
+            <div class="calc-section formula-box">
+                <div class="calc-section-label">Fórmula</div>
+                <code>v = √(GM_T / r)</code>
+            </div>
+
+            <div class="calc-section data-box">
+                <div class="calc-section-label">Datos reales</div>
+                <code>r = R_T + h_LEO = 6,371 + 185 = 6,556 km
+r = 6.556 × 10⁶ m
+GM_T = 3.986 × 10¹⁴ m³/s²</code>
+            </div>
+
+            <div class="calc-section sust-box">
+                <div class="calc-section-label">Sustitución</div>
+                <code>v = √(3.986×10¹⁴ / 6.556×10⁶)
+v = √(60,795,607)</code>
+            </div>
+
+            <div class="calc-section result-box">
+                <div class="calc-section-label">Resultado</div>
+                <div class="result-value">v = 7,797 m/s ≈ 7.80 km/s</div>
+            </div>
+
+            <div class="calc-section extra-box">
+                <div class="calc-section-label">Por qué importa</div>
+                <code>El Orion da una vuelta completa a la Tierra cada ~89 minutos
+a esta velocidad. No 'flota' — está en caída libre constante
+alrededor del planeta.</code>
+            </div>
+
+            <div class="calc-section"
+                style="background:rgba(167,139,250,0.04); border-top:1px solid rgba(167,139,250,0.12);">
+                <div class="debate-box">La profe puede preguntar por qué los astronautas flotan si hay gravedad.
+                    Respuesta: porque están cayendo continuamente junto con la nave — es ingravidez aparente, no
+                    ausencia de gravedad.</div>
+            </div>
+        </div>
+
+        <!-- CÁLCULO 2: V ESCAPE -->
+        <div class="calc-block" id="v-escape">
+            <div class="calc-block-title">
+                Velocidad de escape desde LEO
+                <span class="tag fisica">física</span>
+            </div>
+            <div class="calc-block-intro">
+                Para salir definitivamente del campo gravitacional terrestre desde LEO, la nave necesita alcanzar la
+                velocidad de escape. Se iguala la energía cinética con la energía potencial gravitacional: ½mv² = GMm/r.
+            </div>
+
+            <div class="calc-section formula-box">
+                <div class="calc-section-label">Fórmula</div>
+                <code>v_esc = √(2 · GM_T / r) = √2 · v_orbital</code>
+            </div>
+
+            <div class="calc-section data-box">
+                <div class="calc-section-label">Datos reales (misma r que LEO)</div>
+                <code>r = 6.556 × 10⁶ m
+v_esc = √(2 × 3.986×10¹⁴ / 6.556×10⁶)
+v_esc = √(121,591,214)</code>
+            </div>
+
+            <div class="calc-section result-box">
+                <div class="calc-section-label">Resultado</div>
+                <div class="result-value">v_esc = 11,027 m/s ≈ 11.03 km/s</div>
+            </div>
+
+            <div class="calc-section" style="background:rgba(52,211,153,0.04); border:1px solid rgba(52,211,153,0.12);">
+                <div class="calc-section-label" style="color:var(--green)">Verificación elegante</div>
+                <code>v_esc = √2 × v_orbital = 1.4142 × 7,797 = 11,028 m/s ✓</code>
+            </div>
+
+            <div class="calc-section extra-box">
+                <div class="calc-section-label">Por qué importa</div>
+                <code>La velocidad de escape es siempre √2 veces la velocidad orbital
+a la misma altura. Esto sale directo de conservación de energía
+— no depende de la masa de la nave.</code>
+            </div>
+
+            <div class="calc-section" style="background:rgba(167,139,250,0.04);">
+                <div class="debate-box">Si la profe pide que demuestres la relación v_esc = √2 · v_orbital: parte de
+                    ½mv² = GMm/r (escape) vs GMm/r² = mv²/r (órbita), despeja v en cada una y divide. Sale √2
+                    directamente.</div>
+            </div>
+        </div>
+
+        <!-- CÁLCULO 3: TLI Δv -->
+        <div class="calc-block" id="tli">
+            <div class="calc-block-title">
+                Δv del TLI (Trans-Lunar Injection)
+                <span class="tag mision">misión</span>
+            </div>
+            <div class="calc-block-intro">
+                El TLI es la quema que acelera el Orion desde su órbita en LEO hasta la velocidad necesaria para escapar
+                la esfera de influencia terrestre y viajar hacia la Luna. El Δv es la diferencia de velocidades entre
+                ambos estados.
+            </div>
+
+            <div class="calc-section formula-box">
+                <div class="calc-section-label">Fórmula</div>
+                <code>Δv_TLI = v_TLI − v_LEO</code>
+            </div>
+
+            <div class="calc-section data-box">
+                <div class="calc-section-label">Datos reales Artemis II</div>
+                <code>v_LEO = 7.80 km/s (calculado arriba)
+v_TLI = 10.9 km/s (dato oficial NASA)
+v_esc = 11.03 km/s (calculado arriba)</code>
+            </div>
+
+            <div class="calc-section sust-box">
+                <div class="calc-section-label">Sustitución</div>
+                <code>Δv_TLI = 10.9 − 7.80</code>
+            </div>
+
+            <div class="calc-section result-box">
+                <div class="calc-section-label">Resultado</div>
+                <div class="result-value">Δv_TLI = 3.10 km/s</div>
+            </div>
+
+            <div class="calc-section" style="background:rgba(79,195,247,0.04); border:1px solid rgba(79,195,247,0.1);">
+                <div class="calc-section-label">¿Por qué 10.9 y no 11.03?</div>
+                <code>El Orion NO necesita escapar completamente la Tierra.
+Solo necesita alcanzar la órbita lunar (~384,400 km).
+La gravedad lunar 'jala' la nave durante el viaje.
+Ahorra ~0.13 km/s vs velocidad de escape total.</code>
+            </div>
+
+            <div class="calc-section extra-box">
+                <div class="calc-section-label">Por qué importa</div>
+                <code>El Δv de 3.10 km/s lo provee el motor J-2X del SLS en una
+quema de ~21 minutos. Cada m/s de Δv cuesta toneladas de
+combustible — ecuación de Tsiolkovsky: Δv = v_e · ln(m₀/m_f).</code>
+            </div>
+        </div>
+
+        <!-- CÁLCULO 4: GRAVEDAD VARIABLE -->
+        <div class="calc-block" id="gravedad">
+            <div class="calc-block-title">
+                Aceleración gravitacional variable
+                <span class="tag fisica">física</span>
+                <span class="tag avanzado">avanzado</span>
+            </div>
+            <div class="calc-block-intro">
+                g = GM_T / r². A medida que el Orion se aleja de la Tierra, la gravedad que siente disminuye con el
+                cuadrado de la distancia.
+            </div>
+
+            <div class="calc-section formula-box">
+                <div class="calc-section-label">Fórmula</div>
+                <code>g = GM_T / r²</code>
+            </div>
+
+            <div class="calc-section data-box">
+                <div class="calc-section-label">En superficie terrestre</div>
+                <code>r = 6.371×10⁶ m
+g = 3.986×10¹⁴ / (6.371×10⁶)²
+g = 3.986×10¹⁴ / 4.059×10¹³</code>
+            </div>
+
+            <div class="calc-section result-box">
+                <div class="calc-section-label">g en superficie</div>
+                <div class="result-value" style="font-size:1.4rem">g = 9.82 m/s² (valor de referencia ✓)</div>
+            </div>
+
+            <div class="calc-section data-box">
+                <div class="calc-section-label">En LEO (185 km)</div>
+                <code>r = 6.556×10⁶ m
+g = 3.986×10¹⁴ / (6.556×10⁶)²
+g = 3.986×10¹⁴ / 4.298×10¹³</code>
+            </div>
+
+            <div class="calc-section result-box">
+                <div class="calc-section-label">g en LEO</div>
+                <div class="result-value" style="font-size:1.4rem">g = 9.28 m/s² (solo 5.5% menos que en superficie)
+                </div>
+            </div>
+
+            <div class="calc-section data-box">
+                <div class="calc-section-label">A mitad de camino (~192,200 km)</div>
+                <code>r = 1.922×10⁸ m
+g = 3.986×10¹⁴ / (1.922×10⁸)²
+g = 3.986×10¹⁴ / 3.694×10¹⁶</code>
+            </div>
+
+            <div class="calc-section result-box">
+                <div class="calc-section-label">g a mitad del viaje</div>
+                <div class="result-value" style="font-size:1.4rem">g = 0.0108 m/s² (≈ 910 veces menor que en superficie)
+                </div>
+            </div>
+        </div>
+
+        <!-- CÁLCULO 5: PUNTO NEUTRO -->
+        <div class="calc-block" id="neutro">
+            <div class="calc-block-title">
+                Punto neutro Tierra-Luna
+                <span class="tag fisica">física</span>
+            </div>
+            <div class="calc-block-intro">
+                Existe un punto en la ruta donde la atracción gravitacional de la Tierra y la Luna son iguales en
+                magnitud pero opuestas en dirección — la fuerza neta sobre el Orion en esa dirección es cero. Se
+                encuentra igualando ambas aceleraciones.
+            </div>
+
+            <div class="calc-section formula-box">
+                <div class="calc-section-label">Condición de equilibrio</div>
+                <code>GM_T / r² = GM_L / (d − r)²</code>
+            </div>
+
+            <div class="calc-section sust-box">
+                <div class="calc-section-label">Reorganizando</div>
+                <code>(d − r)² / r² = GM_L / GM_T
+(d − r) / r = √(GM_L / GM_T)
+(d − r) / r = √(4.903×10¹² / 3.986×10¹⁴)
+(d − r) / r = √(0.01230) = 0.1109</code>
+            </div>
+
+            <div class="calc-section data-box">
+                <div class="calc-section-label">Despejando r</div>
+                <code>d/r − 1 = 0.1109
+d/r = 1.1109
+r = 384,400 / 1.1109</code>
+            </div>
+
+            <div class="calc-section result-box">
+                <div class="calc-section-label">Distancia desde la Tierra</div>
+                <div class="result-value">r ≈ 346,000 km (90% del camino a la Luna)</div>
+            </div>
+
+            <div class="calc-section" style="background:rgba(52,211,153,0.04); border:1px solid rgba(52,211,153,0.12);">
+                <div class="calc-section-label" style="color:var(--green)">Verificación</div>
+                <code>g_T en 346,000 km = 3.986×10¹⁴/(3.46×10⁸)² = 3.33×10⁻³ m/s²
+g_L en 38,400 km  = 4.903×10¹²/(3.84×10⁷)² = 3.33×10⁻³ m/s² ✓</code>
+            </div>
+
+            <div class="calc-section extra-box">
+                <div class="calc-section-label">Por qué importa</div>
+                <code>Este punto está a ~346,000 km de la Tierra — a solo 38,400 km
+de la Luna. Antes de este punto, la Tierra 'frena' más.
+Después, la Luna 'jala' más.
+El Orion cruza este punto ~3.5 días después del lanzamiento.</code>
+            </div>
+        </div>
+
+        <!-- CÁLCULO 6: VELOCIDAD ORBITAL LUNA -->
+        <div class="calc-block" id="luna-orbital">
+            <div class="calc-block-title">
+                Velocidad orbital de la Luna
+                <span class="tag fisica">física</span>
+            </div>
+            <div class="calc-block-intro">
+                Para 'encontrar' la Luna, la NASA necesitaba saber exactamente dónde estaría 4 días después del
+                lanzamiento. La Luna orbita a ~384,400 km de la Tierra — ¿a qué velocidad?
+            </div>
+
+            <div class="calc-section formula-box">
+                <div class="calc-section-label">Fórmula (misma que para LEO)</div>
+                <code>v_L = √(GM_T / d_T-L)</code>
+            </div>
+
+            <div class="calc-section data-box">
+                <div class="calc-section-label">Datos</div>
+                <code>d_T-L = 384,400 km = 3.844×10⁸ m
+v_L = √(3.986×10¹⁴ / 3.844×10⁸)
+v_L = √(1,037,461)</code>
+            </div>
+
+            <div class="calc-section result-box">
+                <div class="calc-section-label">Velocidad orbital de la Luna</div>
+                <div class="result-value">v_L = 1,018 m/s ≈ 1.02 km/s</div>
+            </div>
+
+            <div class="calc-section" style="background:rgba(79,195,247,0.04); border:1px solid rgba(79,195,247,0.1);">
+                <div class="calc-section-label">¿Cuánto se mueve en 4 días?</div>
+                <code>t = 4 días = 4 × 86,400 = 345,600 s
+d = v × t = 1,018 × 345,600
+d ≈ 351,821 km  (casi una vuelta completa al ecuador terrestre)</code>
+            </div>
+
+            <div class="calc-section extra-box">
+                <div class="calc-section-label">Por qué importa</div>
+                <code>En los 4 días que tardó el Orion en llegar, la Luna recorrió
+~351,800 km en su órbita. La NASA calculó el punto exacto de
+intercepción con meses de anticipación usando efemérides
+y integración numérica.</code>
+            </div>
+
+            <div class="calc-section" style="background:rgba(167,139,250,0.04);">
+                <div class="debate-box">Este cálculo conecta física con ingeniería de misión: '¿Cómo sabían dónde iba a
+                    estar la Luna? Porque su velocidad orbital es ~1.02 km/s, completamente predecible con mecánica
+                    newtoniana.'</div>
+            </div>
+        </div>
+
+        <!-- CÁLCULO 7: FLYBY EN PERICYNTHION -->
+        <div class="calc-block" id="pericynthion">
+            <div class="calc-block-title">
+                Velocidad de escape lunar en pericynthion
+                <span class="tag mision">misión</span>
+                <span class="tag fisica">física</span>
+            </div>
+            <div class="calc-block-intro">
+                El pericynthion es el punto de máximo acercamiento a la Luna: 6,545 km sobre la superficie (6 de abril,
+                2026). Calculamos la velocidad de escape de la Luna en ese punto para entender la energía mínima del
+                flyby.
+            </div>
+
+            <div class="calc-section formula-box">
+                <div class="calc-section-label">Velocidad de escape lunar en pericynthion</div>
+                <code>v_esc_L = √(2 · GM_L / r_peri)</code>
+            </div>
+
+            <div class="calc-section data-box">
+                <div class="calc-section-label">Radio en pericynthion</div>
+                <code>r_peri = R_L + h_peri = 1,737 + 6,545 = 8,282 km
+r_peri = 8.282 × 10⁶ m</code>
+            </div>
+
+            <div class="calc-section sust-box">
+                <div class="calc-section-label">Sustitución</div>
+                <code>v_esc_L = √(2 × 4.903×10¹² / 8.282×10⁶)
+v_esc_L = √(1,184,870)</code>
+            </div>
+
+            <div class="calc-section result-box">
+                <div class="calc-section-label">Velocidad mínima en pericynthion</div>
+                <div class="result-value">v_esc_L ≈ 1,088 m/s ≈ 1.09 km/s</div>
+            </div>
+
+            <div class="calc-section" style="background:rgba(79,195,247,0.04); border:1px solid rgba(79,195,247,0.1);">
+                <div class="calc-section-label">Contexto físico del flyby</div>
+                <code>El Orion pasa en trayectoria hiperbólica respecto a la Luna.
+Velocidad real > v_esc_L → la Luna NO captura la nave.
+La gravedad lunar dobla la trayectoria ~180° en la cara oculta.
+Resultado: la nave regresa hacia la Tierra sin usar combustible.</code>
+            </div>
+
+            <div class="calc-section extra-box">
+                <div class="calc-section-label">Por qué importa</div>
+                <code>Que el Orion supere la velocidad de escape lunar es clave:
+significa que la Luna NO captura la nave, solo curva su
+trayectoria. Es como un 'rebote gravitacional' que lo devuelve
+a casa.</code>
+            </div>
+
+            <div class="calc-section" style="background:rgba(167,139,250,0.04);">
+                <div class="debate-box">Para el debate: 'El flyby a 6,545 km no era para ver la Luna — era para que la
+                    gravedad lunar actuara como timón, doblando la trayectoria de regreso a la Tierra sin gastar
+                    combustible.'</div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+       BLOQUE III — RESUMEN DE FÓRMULAS
+  ══════════════════════════════════════════ -->
+        <div class="section-divider"></div>
+
+        <div class="session-header" style="margin-top:0">
+            <span class="session-label">Resumen de fórmulas</span>
+            <span class="session-time">Referencia rápida</span>
+        </div>
+
+        <div class="calc-block" style="border-color:rgba(79,195,247,0.2)">
+            <div class="calc-section formula-box">
+                <div class="calc-section-label">Todas las fórmulas clave</div>
+                <code>v_orbital  = √(GM / r)                  → velocidad en órbita circular
+v_escape   = √(2GM / r) = √2 · v_orbital → velocidad para escapar
+Δv         = v_f − v_i                   → cambio de velocidad (quema)
+Δv         = v_e · ln(m₀ / m_f)         → ecuación de Tsiolkovsky
+g          = GM / r²                     → aceleración gravitacional
+T²         ∝ a³                          → 3ª Ley de Kepler
+
+Constantes:
+  GM_Tierra = 3.986 × 10¹⁴ m³/s²
+  GM_Luna   = 4.903 × 10¹² m³/s²
+  R_Tierra  = 6,371 km
+  R_Luna    = 1,737 km
+  d_T-L     = 384,400 km</code>
+            </div>
+        </div>
+
     </div>
 </body>
 
