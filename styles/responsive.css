@@ -1,0 +1,108 @@
+/* responsive.css */
+
+@media (max-width: 992px) {
+    .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    aside.col-lg-3 {
+        border-left: none;
+        border-top: 1px solid var(--border-subtle);
+    }
+
+    #resources-edit-panel {
+        gap: 4px !important;
+    }
+
+    #money, #population, #happiness {
+        font-size: 0.72rem;
+        padding: 2px 6px;
+        white-space: nowrap;
+    }
+
+    .resource-edit-input {
+        width: 55px;
+        font-size: 0.72rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .create-container {
+        padding: 4.5rem 1rem 1rem;
+    }
+
+    #screen-title {
+        font-size: 0.85rem !important;
+        letter-spacing: 0.15em;
+    }
+
+    .form-section {
+        padding: 1rem;
+    }
+
+    #game-page .row {
+        margin-top: 130px;
+    }
+
+    #header-center {
+        display: none;
+    }
+
+    #header-right {
+        width: 100%;
+    }
+
+    #resources-edit-panel {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        width: 100%;
+        gap: 4px;
+    }
+
+    #resources-edit-panel #money,
+    #resources-edit-panel #population,
+    #resources-edit-panel #happiness {
+        text-align: center;
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+
+    #resources-edit-panel .resource-edit-row {
+        justify-content: center;
+        padding: 4px 2px;
+        font-size: 11px;
+    }
+
+    #resources-edit-panel .resource-edit-input {
+        width: 45px;
+        font-size: 11px;
+    }
+
+    .puntuation {
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    #initial-page #screen-title {
+        font-size: 1.5rem !important;
+    }
+
+    #buttons .btn {
+        font-size: 0.75rem;
+        padding: 10px 16px;
+    }
+
+    #header {
+        padding: 8px 12px !important;
+    }
+
+    #game-page .row {
+        margin-top: 160px;
+    }
+
+    #resources-edit-panel {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
